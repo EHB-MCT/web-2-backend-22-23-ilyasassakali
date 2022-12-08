@@ -4,12 +4,14 @@ const cors = require('cors')
 const {
     MongoClient
 } = require('mongodb')
+const {
+    v4: uuidv4,
+    validate: uuidValidate
+} = require('uuid')
 require('dotenv').config()
 
 //create mongoclient
 const client = new MongoClient(process.env.FINAL_URL)
-
-let users = [];
 
 app.use(express.urlencoded({
     extended: false
@@ -47,6 +49,7 @@ app.post("/register", async (req, res) => {
             status: "Bad request",
             message: "Some fields are missing: username, email, password"
         })
+        return
     }
 
     try {
@@ -56,13 +59,12 @@ app.post("/register", async (req, res) => {
         const user = {
             username: req.body.username,
             email: req.body.email,
-            password: req.body.password
+            password: req.body.password,
+            uuid: uuidv4()
         }
         //retrieve the users collection data
         const colli = client.db('logintutorial').collection('users');
         const insertedUser = await colli.insertOne(user)
-
-        
 
         //send back when user is saved
         res.status(201).send({
@@ -91,6 +93,7 @@ app.post("/login", async (req, res) => {
             status: "Bad request",
             message: "Some fields are missing: username, email, password"
         })
+        return
     }
 
     try {
@@ -132,6 +135,7 @@ app.post("/login", async (req, res) => {
             })
         }
 
+
     } catch (error) {
         console.log(error);
         res.status(500).send({
@@ -145,6 +149,68 @@ app.post("/login", async (req, res) => {
 
 })
 
+app.post("/verifyID", async (req, res) => {
+
+
+    //check for empty and faulty ID fields
+    if (!req.body.uuid) {
+        res.status(401).send({
+            status: "Bad request",
+            message: "ID is missing"
+        })
+        return
+    } else {
+        if (!uuidValidate(req.body.uuid)) {
+            res.status(401).send({
+                status: "Bad request",
+                message: "ID is not a valid UUID"
+            })
+            return
+        }
+    }
+
+    try {
+        //connect to the db
+        await client.connect();
+
+        //retrieve the users collection data
+        const colli = client.db('logintutorial').collection('users');
+
+        const query = {
+            uuid: req.body.uuid
+        }
+        const user = await colli.findOne(query)
+
+        if (user) {
+
+            res.status(200).send({
+                status: "Verified!",
+                message: "You UUID is valid!",
+                data: {
+                    username: user.username,
+                    email: user.email,
+                    uuid: user.uuid
+                }
+            })
+        } else {
+            //password is incorrect
+            res.status(401).send({
+                status: "Verify error",
+                message: `No user exists with uuid ${req.body.uuid}!`
+            })
+        }
+    } catch (error) {
+        console.log(error);
+        res.status(500).send({
+            error: 'something went wrong',
+            value: error
+        });
+    } finally {
+        await client.close();
+    }
+
+
+})
 
 app.listen(3000);
 console.log("app running at http://localhost:3000");
