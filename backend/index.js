@@ -1,6 +1,13 @@
 const express = require('express')
 const app = express()
 const cors = require('cors')
+const {
+    MongoClient
+} = require('mongodb')
+require('dotenv').config()
+
+//create mongoclient
+const client = new MongoClient(process.env.FINAL_URL)
 
 let users = [];
 
@@ -10,7 +17,28 @@ app.use(express.urlencoded({
 app.use(cors())
 app.use(express.json())
 
-app.post("/register", (req, res) => {
+app.get('/testMongo', async (req, res) => {
+    try {
+        //connect to the db
+        await client.connect();
+        //retrieve the users collection data
+        const colli = client.db('logintutorial').collection('users');
+        const users = await colli.find({}).toArray();
+
+        //send back the data with response
+        res.status(200).send(users);
+    } catch (error) {
+        console.log(error);
+        res.status(500).send({
+            error: 'something went wrong',
+            value: error
+        });
+    } finally {
+        await client.close();
+    }
+})
+
+app.post("/register", async (req, res) => {
 
 
     //check for empty fields
@@ -20,22 +48,41 @@ app.post("/register", (req, res) => {
             message: "Some fields are missing: username, email, password"
         })
     }
-    //save to users array
-    users.push({
-        username: req.body.username,
-        email: req.body.email,
-        password: req.body.password
-    })
 
-    //send back when user is registered
-    res.send({
-        status: "Saved",
-        message: "User has been saved"
-    })
+    try {
+        //connect to the db
+        await client.connect();
+
+        const user = {
+            username: req.body.username,
+            email: req.body.email,
+            password: req.body.password
+        }
+        //retrieve the users collection data
+        const colli = client.db('logintutorial').collection('users');
+        const insertedUser = await colli.insertOne(user)
+
+        
+
+        //send back when user is saved
+        res.status(201).send({
+            status: "Saved",
+            message: "User has been saved",
+            data: insertedUser
+        })
+    } catch (error) {
+        console.log(error);
+        res.status(500).send({
+            error: 'something went wrong',
+            value: error
+        });
+    } finally {
+        await client.close();
+    }
 
 })
 
-app.post("/login", (req, res) => {
+app.post("/login", async (req, res) => {
 
 
     //check for empty fields
@@ -46,31 +93,56 @@ app.post("/login", (req, res) => {
         })
     }
 
-    //check for the user in array users
-    let user = users.find(element => element.email == req.body.email)
+    try {
+        //connect to the db
+        await client.connect();
 
-    if (user) {
-        //compare passwords
-        if (user.password == req.body.password) {
-            //password is correct
-            res.status(200).send({
-                status: "Authentication succesfull!",
-                message: "You are logged in!"
-            })
+        const loginuser = {
+            email: req.body.email,
+            password: req.body.password
+        }
+        //retrieve the users collection data
+        const colli = client.db('logintutorial').collection('users');
+
+        const query = {
+            email: loginuser.email
+        }
+        const user = await colli.findOne(query)
+
+        if (user) {
+            //compare passwords
+            if (user.password == loginuser.password) {
+                //password is correct
+                res.status(200).send({
+                    status: "Authentication succesfull!",
+                    message: "You are logged in!"
+                })
+            } else {
+                //password is incorrect
+                res.status(401).send({
+                    status: "Authentication error",
+                    message: "Password is incorrect!"
+                })
+            }
         } else {
-            //password is incorrect
+            //no user found: send back error
             res.status(401).send({
                 status: "Authentication error",
-                message: "Password is incorrect!"
+                message: "No user with email has been found! Make sure your register first!"
             })
         }
-    } else {
-        //no user found: send back error
-        res.status(401).send({
-            status: "Authentication error",
-            message: "No user with email has been found! Make sure your register first!"
-        })
+
+    } catch (error) {
+        console.log(error);
+        res.status(500).send({
+            error: 'something went wrong',
+            value: error
+        });
+    } finally {
+        await client.close();
     }
+
+
 })
 
 
