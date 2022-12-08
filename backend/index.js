@@ -118,7 +118,12 @@ app.post("/login", async (req, res) => {
                 //password is correct
                 res.status(200).send({
                     status: "Authentication succesfull!",
-                    message: "You are logged in!"
+                    message: "You are logged in!",
+                    data: {
+                        username: user.username,
+                        email: user.email,
+                        uuid: user.uuid
+                    }
                 })
             } else {
                 //password is incorrect
