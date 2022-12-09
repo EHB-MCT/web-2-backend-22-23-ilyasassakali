@@ -91,7 +91,7 @@ app.post("/login", async (req, res) => {
     if (!req.body.email || !req.body.password) {
         res.status(401).send({
             status: "Bad request",
-            message: "Some fields are missing: username, email, password"
+            message: "Some fields are missing: email, password"
         })
         return
     }
@@ -138,9 +138,8 @@ app.post("/login", async (req, res) => {
                 status: "Authentication error",
                 message: "No user with email has been found! Make sure your register first!"
             })
+
         }
-
-
     } catch (error) {
         console.log(error);
         res.status(500).send({
