@@ -19,6 +19,7 @@ app.use(express.urlencoded({
 app.use(cors())
 app.use(express.json())
 
+//LOGIN SYSTEM
 app.get('/testMongo', async (req, res) => {
     try {
         //connect to the db
@@ -215,6 +216,142 @@ app.post("/verifyID", async (req, res) => {
 
 
 })
+
+//MUZZY SYSTEM
+app.get('/AllMuzzys', async (req, res) => {
+    try {
+        //connect to the db
+        await client.connect();
+        //retrieve the muzzys collection data
+        const colli = client.db('muzzysystem').collection('muzzys');
+        const muzzys = await colli.find({}).toArray();
+
+        //send back the data with response
+        res.status(200).send(muzzys);
+    } catch (error) {
+        console.log(error);
+        res.status(500).send({
+            error: 'something went wrong',
+            value: error
+        });
+    } finally {
+        await client.close();
+    }
+})
+
+app.post("/savemuzzy", async (req, res) => {
+
+
+    //check for empty fields
+    if (!req.body.opinion || !req.body.score) {
+        res.status(401).send({
+            status: "Bad request",
+            message: "Some fields are missing: opinion, score"
+        })
+        return
+    }
+
+
+    try {
+        //connect to the db
+        await client.connect();
+
+        const muzzy = {
+            opinion: req.body.opinion,
+            score: req.body.score,
+            muzzyimg: req.body.muzzyimg,
+            muzzytrack: req.body.muzzytrack,
+            muzzyartist: req.body.muzzyartist,
+            uuid: uuidv4()
+        }
+        //retrieve the users collection data
+        const colli = client.db('muzzysystem').collection('muzzys');
+        const insertedMuzzy = await colli.insertOne(muzzy)
+
+        //send back when muzzy is saved
+        res.status(201).send({
+            status: "Saved",
+            message: "Muzzy has been saved",
+            data: insertedMuzzy
+
+        })
+    } catch (error) {
+        console.log(error);
+        res.status(500).send({
+            error: 'something went wrong',
+            value: error
+        });
+    } finally {
+        await client.close();
+    }
+
+})
+
+app.post("/showsavedmuzzys", async (req, res) => {
+
+
+    //check for empty fields
+    if (!req.body.opinion || !req.body.score) {
+        res.status(401).send({
+            status: "Bad request",
+            message: "Some fields are missing: opinion, score"
+        })
+        return
+    }
+
+    try {
+        //connect to the db
+        await client.connect();
+
+        const savedmuzzy = {
+            opinion: req.body.opinion,
+            score: req.body.score,
+            muzzyimg: req.body.muzzyimg,
+        }
+        //retrieve the muzzys collection data
+        const colli = client.db('muzzysystem').collection('muzzys');
+
+        const query = {
+            score: savedmuzzy.score
+        }
+        const muzzy = await colli.findOne(query)
+
+        if (muzzy) {
+
+            res.status(200).send({
+                status: "Muzz succesfull!",
+                message: "Your muzzy is placed!",
+                data: {
+                    opinion: muzzy.opinion,
+                    score: muzzy.score,
+                    muzzyimg: muzzy.muzzyimg,
+                    muzzytrack: muzzy.muzzytrack,
+                    muzzyartist: muzzy.muzzyartist,
+                    uuid: muzzy.uuid
+                }
+            })
+
+        } else {
+            //no user found: send back error
+            res.status(401).send({
+                status: "Muzz error",
+                message: "No Muzzy with has been found! Make sure you muzz first!"
+            })
+
+        }
+    } catch (error) {
+        console.log(error);
+        res.status(500).send({
+            error: 'something went wrong',
+            value: error
+        });
+    } finally {
+        await client.close();
+    }
+
+
+})
+
 
 app.listen(3000);
 console.log("app running at http://localhost:3000");
