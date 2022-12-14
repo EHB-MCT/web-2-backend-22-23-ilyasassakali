@@ -262,6 +262,9 @@ app.post("/savemuzzy", async (req, res) => {
             muzzyimg: req.body.muzzyimg,
             muzzytrack: req.body.muzzytrack,
             muzzyartist: req.body.muzzyartist,
+            username: req.body.username,
+            date: req.body.date,
+            time: req.body.time,
             uuid: uuidv4()
         }
         //retrieve the users collection data
