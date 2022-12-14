@@ -290,6 +290,77 @@ app.post("/savemuzzy", async (req, res) => {
 
 })
 
+app.get('/AllalbumMuzzys', async (req, res) => {
+    try {
+        //connect to the db
+        await client.connect();
+        //retrieve the muzzys collection data
+        const colli = client.db('muzzysystem').collection('albummuzzys');
+        const muzzys = await colli.find({}).toArray();
+
+        //send back the data with response
+        res.status(200).send(muzzys);
+    } catch (error) {
+        console.log(error);
+        res.status(500).send({
+            error: 'something went wrong',
+            value: error
+        });
+    } finally {
+        await client.close();
+    }
+})
+
+app.post("/savealbummuzzy", async (req, res) => {
+
+
+    //check for empty fields
+    if (!req.body.opinion || !req.body.score) {
+        res.status(401).send({
+            status: "Bad request",
+            message: "Some fields are missing: opinion, score"
+        })
+        return
+    }
+
+
+    try {
+        //connect to the db
+        await client.connect();
+
+        const muzzy = {
+            opinion: req.body.opinion,
+            score: req.body.score,
+            muzzyimg: req.body.muzzyimg,
+            muzzyalbum: req.body.muzzyalbum,
+            muzzyartist: req.body.muzzyartist,
+            username: req.body.username,
+            date: req.body.date,
+            time: req.body.time,
+            uuid: uuidv4()
+        }
+        //retrieve the users collection data
+        const colli = client.db('muzzysystem').collection('albummuzzys');
+        const insertedMuzzy = await colli.insertOne(muzzy)
+
+        //send back when muzzy is saved
+        res.status(201).send({
+            status: "Saved",
+            message: "Muzzy has been saved",
+            data: insertedMuzzy
+
+        })
+    } catch (error) {
+        console.log(error);
+        res.status(500).send({
+            error: 'something went wrong',
+            value: error
+        });
+    } finally {
+        await client.close();
+    }
+
+})
 
 
 
