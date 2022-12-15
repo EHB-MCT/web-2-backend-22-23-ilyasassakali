@@ -267,6 +267,7 @@ app.post("/savemuzzy", async (req, res) => {
             username: req.body.username,
             date: req.body.date,
             time: req.body.time,
+            idtrack: req.body.idtrack,
             uuid: uuidv4()
         }
         //retrieve the users collection data
@@ -341,6 +342,7 @@ app.post("/savealbummuzzy", async (req, res) => {
             username: req.body.username,
             date: req.body.date,
             time: req.body.time,
+            idalbum: req.body.idalbum,
             uuid: uuidv4()
         }
         //retrieve the users collection data
@@ -413,6 +415,7 @@ app.post("/saveartistmuzzy", async (req, res) => {
             username: req.body.username,
             date: req.body.date,
             time: req.body.time,
+            idartist: req.body.idartist,
             uuid: uuidv4()
         }
         //retrieve the users collection data
