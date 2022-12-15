@@ -10,6 +10,8 @@ const {
 } = require('uuid')
 require('dotenv').config()
 
+
+
 //create mongoclient
 const client = new MongoClient(process.env.FINAL_URL)
 
@@ -18,6 +20,234 @@ app.use(express.urlencoded({
 }));
 app.use(cors())
 app.use(express.json())
+
+
+//MUZZY SYSTEM
+
+//muzzytracks
+app.get('/AllMuzzys', async (req, res) => {
+    try {
+        //connect to the db
+        await client.connect();
+        //retrieve the muzzys collection data
+        const colli = client.db('muzzysystem').collection('muzzys');
+        const muzzys = await colli.find({}).toArray();
+
+        //send back the data with response
+        res.status(200).send(muzzys);
+    } catch (error) {
+        console.log(error);
+        res.status(500).send({
+            error: 'something went wrong',
+            value: error
+        });
+    } finally {
+        await client.close();
+    }
+})
+
+app.post("/savemuzzy", async (req, res) => {
+
+
+    //check for empty fields
+    if (!req.body.opinion || !req.body.score) {
+        res.status(401).send({
+            status: "Bad request",
+            message: "Some fields are missing: opinion, score"
+        })
+        return
+    }
+
+
+    try {
+        //connect to the db
+        await client.connect();
+
+        const muzzy = {
+            opinion: req.body.opinion,
+            score: req.body.score,
+            muzzyimg: req.body.muzzyimg,
+            muzzytrack: req.body.muzzytrack,
+            muzzyartist: req.body.muzzyartist,
+            username: req.body.username,
+            date: req.body.date,
+            time: req.body.time,
+            idtrack: req.body.idtrack,
+            uuid: uuidv4()
+        }
+        //retrieve the users collection data
+        const colli = client.db('muzzysystem').collection('muzzys');
+        const insertedMuzzy = await colli.insertOne(muzzy)
+
+        //send back when muzzy is saved
+        res.status(201).send({
+            status: "Saved",
+            message: "Muzzy has been saved",
+            data: insertedMuzzy
+
+        })
+    } catch (error) {
+        console.log(error);
+        res.status(500).send({
+            error: 'something went wrong',
+            value: error
+        });
+    } finally {
+        await client.close();
+    }
+
+})
+
+//muzzyalbums
+app.get('/AllalbumMuzzys', async (req, res) => {
+    try {
+        //connect to the db
+        await client.connect();
+        //retrieve the muzzys collection data
+        const colli = client.db('muzzysystem').collection('albummuzzys');
+        const muzzys = await colli.find({}).toArray();
+
+        //send back the data with response
+        res.status(200).send(muzzys);
+    } catch (error) {
+        console.log(error);
+        res.status(500).send({
+            error: 'something went wrong',
+            value: error
+        });
+    } finally {
+        await client.close();
+    }
+})
+
+app.post("/savealbummuzzy", async (req, res) => {
+
+
+    //check for empty fields
+    if (!req.body.opinion || !req.body.score) {
+        res.status(401).send({
+            status: "Bad request",
+            message: "Some fields are missing: opinion, score"
+        })
+        return
+    }
+
+
+    try {
+        //connect to the db
+        await client.connect();
+
+        const muzzy = {
+            opinion: req.body.opinion,
+            score: req.body.score,
+            muzzyimg: req.body.muzzyimg,
+            muzzyalbum: req.body.muzzyalbum,
+            muzzyartist: req.body.muzzyartist,
+            username: req.body.username,
+            date: req.body.date,
+            time: req.body.time,
+            idalbum: req.body.idalbum,
+            uuid: uuidv4()
+        }
+        //retrieve the users collection data
+        const colli = client.db('muzzysystem').collection('albummuzzys');
+        const insertedMuzzy = await colli.insertOne(muzzy)
+
+        //send back when muzzy is saved
+        res.status(201).send({
+            status: "Saved",
+            message: "Muzzy has been saved",
+            data: insertedMuzzy
+
+        })
+    } catch (error) {
+        console.log(error);
+        res.status(500).send({
+            error: 'something went wrong',
+            value: error
+        });
+    } finally {
+        await client.close();
+    }
+
+})
+
+//muzzyartists
+app.get('/AllartistMuzzys', async (req, res) => {
+    try {
+        //connect to the db
+        await client.connect();
+        //retrieve the muzzys collection data
+        const colli = client.db('muzzysystem').collection('artistmuzzys');
+        const muzzys = await colli.find({}).toArray();
+
+        //send back the data with response
+        res.status(200).send(muzzys);
+    } catch (error) {
+        console.log(error);
+        res.status(500).send({
+            error: 'something went wrong',
+            value: error
+        });
+    } finally {
+        await client.close();
+    }
+})
+
+app.post("/saveartistmuzzy", async (req, res) => {
+
+
+    //check for empty fields
+    if (!req.body.opinion || !req.body.score) {
+        res.status(401).send({
+            status: "Bad request",
+            message: "Some fields are missing: opinion, score"
+        })
+        return
+    }
+
+
+    try {
+        //connect to the db
+        await client.connect();
+
+        const muzzy = {
+            opinion: req.body.opinion,
+            score: req.body.score,
+            muzzyimg: req.body.muzzyimg,
+            muzzyartist: req.body.muzzyartist,
+            username: req.body.username,
+            date: req.body.date,
+            time: req.body.time,
+            idartist: req.body.idartist,
+            uuid: uuidv4()
+        }
+        //retrieve the users collection data
+        const colli = client.db('muzzysystem').collection('artistmuzzys');
+        const insertedMuzzy = await colli.insertOne(muzzy)
+
+        //send back when muzzy is saved
+        res.status(201).send({
+            status: "Saved",
+            message: "Muzzy has been saved",
+            data: insertedMuzzy
+
+        })
+    } catch (error) {
+        console.log(error);
+        res.status(500).send({
+            error: 'something went wrong',
+            value: error
+        });
+    } finally {
+        await client.close();
+    }
+
+})
+
+
+
+
 
 //LOGIN SYSTEM
 app.get('/testMongo', async (req, res) => {
@@ -217,229 +447,66 @@ app.post("/verifyID", async (req, res) => {
 
 })
 
-//MUZZY SYSTEM
-
-//muzzytracks
-app.get('/AllMuzzys', async (req, res) => {
+// Get a user with uuid  (using a npm package)
+app.get('/:id', async (req, res) => {
     try {
+        let uuid = req.params.id;
         //connect to the db
-        await client.connect();
-        //retrieve the muzzys collection data
-        const colli = client.db('muzzysystem').collection('muzzys');
-        const muzzys = await colli.find({}).toArray();
+        await client.connect()
 
-        //send back the data with response
-        res.status(200).send(muzzys);
-    } catch (error) {
-        console.log(error);
-        res.status(500).send({
-            error: 'something went wrong',
-            value: error
-        });
-    } finally {
-        await client.close();
-    }
-})
-
-app.post("/savemuzzy", async (req, res) => {
-
-
-    //check for empty fields
-    if (!req.body.opinion || !req.body.score) {
-        res.status(401).send({
-            status: "Bad request",
-            message: "Some fields are missing: opinion, score"
-        })
-        return
-    }
-
-
-    try {
-        //connect to the db
-        await client.connect();
-
-        const muzzy = {
-            opinion: req.body.opinion,
-            score: req.body.score,
-            muzzyimg: req.body.muzzyimg,
-            muzzytrack: req.body.muzzytrack,
-            muzzyartist: req.body.muzzyartist,
-            username: req.body.username,
-            date: req.body.date,
-            time: req.body.time,
-            idtrack: req.body.idtrack,
-            uuid: uuidv4()
-        }
         //retrieve the users collection data
-        const colli = client.db('muzzysystem').collection('muzzys');
-        const insertedMuzzy = await colli.insertOne(muzzy)
+        const usersCollection = client.db('logintutorial').collection('users');
 
-        //send back when muzzy is saved
-        res.status(201).send({
-            status: "Saved",
-            message: "Muzzy has been saved",
-            data: insertedMuzzy
-
-        })
-    } catch (error) {
-        console.log(error);
-        res.status(500).send({
-            error: 'something went wrong',
-            value: error
-        });
-    } finally {
-        await client.close();
-    }
-
-})
-
-
-//muzzyalbums
-app.get('/AllalbumMuzzys', async (req, res) => {
-    try {
-        //connect to the db
-        await client.connect();
-        //retrieve the muzzys collection data
-        const colli = client.db('muzzysystem').collection('albummuzzys');
-        const muzzys = await colli.find({}).toArray();
-
-        //send back the data with response
-        res.status(200).send(muzzys);
-    } catch (error) {
-        console.log(error);
-        res.status(500).send({
-            error: 'something went wrong',
-            value: error
-        });
-    } finally {
-        await client.close();
-    }
-})
-
-app.post("/savealbummuzzy", async (req, res) => {
-
-
-    //check for empty fields
-    if (!req.body.opinion || !req.body.score) {
-        res.status(401).send({
-            status: "Bad request",
-            message: "Some fields are missing: opinion, score"
-        })
-        return
-    }
-
-
-    try {
-        //connect to the db
-        await client.connect();
-
-        const muzzy = {
-            opinion: req.body.opinion,
-            score: req.body.score,
-            muzzyimg: req.body.muzzyimg,
-            muzzyalbum: req.body.muzzyalbum,
-            muzzyartist: req.body.muzzyartist,
-            username: req.body.username,
-            date: req.body.date,
-            time: req.body.time,
-            idalbum: req.body.idalbum,
-            uuid: uuidv4()
+        //queryforuuid
+        const query = {
+            uuid: req.params.id
         }
+
+        const answ = await usersCollection.findOne(query)
+
+        res.status(200).json(answ)
+    } catch (error) {
+
+        res.status(500).send({
+            error: 'something went wrong',
+            value: error.stack
+        })
+    } finally {
+        await client.close()
+    }
+})
+
+// Delete a user with uuid (using a npm package)
+app.delete('/:id', async (req, res) => {
+    try {
+        //connect to the db
+        await client.connect();
+
         //retrieve the users collection data
-        const colli = client.db('muzzysystem').collection('albummuzzys');
-        const insertedMuzzy = await colli.insertOne(muzzy)
+        const usersCollection = client.db('logintutorial').collection('users');
 
-        //send back when muzzy is saved
-        res.status(201).send({
-            status: "Saved",
-            message: "Muzzy has been saved",
-            data: insertedMuzzy
-
-        })
-    } catch (error) {
-        console.log(error);
-        res.status(500).send({
-            error: 'something went wrong',
-            value: error
-        });
-    } finally {
-        await client.close();
-    }
-
-})
-
-//muzzyartists
-app.get('/AllartistMuzzys', async (req, res) => {
-    try {
-        //connect to the db
-        await client.connect();
-        //retrieve the muzzys collection data
-        const colli = client.db('muzzysystem').collection('artistmuzzys');
-        const muzzys = await colli.find({}).toArray();
-
-        //send back the data with response
-        res.status(200).send(muzzys);
-    } catch (error) {
-        console.log(error);
-        res.status(500).send({
-            error: 'something went wrong',
-            value: error
-        });
-    } finally {
-        await client.close();
-    }
-})
-
-app.post("/saveartistmuzzy", async (req, res) => {
-
-
-    //check for empty fields
-    if (!req.body.opinion || !req.body.score) {
-        res.status(401).send({
-            status: "Bad request",
-            message: "Some fields are missing: opinion, score"
-        })
-        return
-    }
-
-
-    try {
-        //connect to the db
-        await client.connect();
-
-        const muzzy = {
-            opinion: req.body.opinion,
-            score: req.body.score,
-            muzzyimg: req.body.muzzyimg,
-            muzzyartist: req.body.muzzyartist,
-            username: req.body.username,
-            date: req.body.date,
-            time: req.body.time,
-            idartist: req.body.idartist,
-            uuid: uuidv4()
+        //queryforuuid
+        const query = {
+            uuid: req.params.id
         }
-        //retrieve the users collection data
-        const colli = client.db('muzzysystem').collection('artistmuzzys');
-        const insertedMuzzy = await colli.insertOne(muzzy)
 
-        //send back when muzzy is saved
-        res.status(201).send({
-            status: "Saved",
-            message: "Muzzy has been saved",
-            data: insertedMuzzy
+        const userDelete = await usersCollection.deleteOne(query)
 
-        })
+        res.status(200).send(userDelete);
     } catch (error) {
-        console.log(error);
-        res.status(500).send({
-            error: 'something went wrong',
-            value: error
-        });
-    } finally {
-        await client.close();
-    }
 
+        res.status(500).send({
+            error: 'error',
+            value: error.stack
+        });
+    }
 })
+
+
+
+
+
+
 
 
 
