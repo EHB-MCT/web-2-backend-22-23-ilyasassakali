@@ -82,7 +82,7 @@ app.post("/savemuzzy", async (req, res) => {
         //send back when muzzy is saved
         res.status(201).send({
             status: "Saved",
-            message: "Muzzy has been saved",
+            message: "Muzzy has been published successfully",
             data: insertedMuzzy
 
         })
@@ -156,7 +156,7 @@ app.post("/savealbummuzzy", async (req, res) => {
         //send back when muzzy is saved
         res.status(201).send({
             status: "Saved",
-            message: "Muzzy has been saved",
+            message: "Muzzy has been published successfully",
             data: insertedMuzzy
 
         })
@@ -229,7 +229,7 @@ app.post("/saveartistmuzzy", async (req, res) => {
         //send back when muzzy is saved
         res.status(201).send({
             status: "Saved",
-            message: "Muzzy has been saved",
+            message: "Muzzy has been published successfully",
             data: insertedMuzzy
 
         })
@@ -300,7 +300,7 @@ app.post("/register", async (req, res) => {
         //send back when user is saved
         res.status(201).send({
             status: "Saved",
-            message: "User has been saved",
+            message: "User has been created",
             data: insertedUser
         })
     } catch (error) {
@@ -502,12 +502,67 @@ app.delete('/:id', async (req, res) => {
     }
 })
 
+// Update username,email and password (using a npm package)
+app.put('/:id', async (req, res) => {
+
+    //check for empty fields
+    if (!req.body.username || !req.body.email || !req.body.password) {
+        res.status(401).send({
+            status: "Bad request",
+            message: "Some fields are missing: username, email, password"
+        })
+        return
+    }
+
+    try {
+
+        //connect to the db
+        await client.connect();
+        //retrieve the users collection data
+        const usersCollection = client.db('logintutorial').collection('users');
+
+        //queryforuuid
+        const query = {
+            uuid: req.params.id
+        }
+
+        const user = {
+            username: req.body.username,
+            email: req.body.email,
+            password: req.body.password,
+        }
 
 
+        const userUpdate = await usersCollection.updateOne(query, {
+            $set: {
+                username: user.username,
+                email: user.email,
+                password: user.password
+            }
+        })
 
+        if (userUpdate) {
+            res.status(201).send({
+                succes: `Profile changes updated succesfully.`,
+            });
+            return;
+        } else {
+            res.status(400).send({
+                error: `Profile changes failed`,
+                value: error.stack,
+            });
+        }
 
-
-
+    } catch (error) {
+        console.log(error);
+        res.status(500).send({
+            error: 'Something went wrong',
+            value: error.stack
+        });
+    } finally {
+        await client.close();
+    }
+});
 
 
 
