@@ -9,9 +9,9 @@ const {
     validate: uuidValidate
 } = require('uuid')
 require('dotenv').config()
-
-
-
+const Track = require('./Track.js')
+const Album = require('./Album.js')
+const Artist = require('./Artist.js')
 //create mongoclient
 const client = new MongoClient(process.env.FINAL_URL)
 
@@ -22,7 +22,7 @@ app.use(cors())
 app.use(express.json())
 
 
-//MUZZY SYSTEM
+//CRUD MUZZY SYSTEM
 
 //muzzytracks
 app.get('/AllMuzzys', async (req, res) => {
@@ -63,21 +63,24 @@ app.post("/savemuzzy", async (req, res) => {
         //connect to the db
         await client.connect();
 
-        const muzzy = {
-            opinion: req.body.opinion,
-            score: req.body.score,
-            muzzyimg: req.body.muzzyimg,
-            muzzytrack: req.body.muzzytrack,
-            muzzyartist: req.body.muzzyartist,
-            username: req.body.username,
-            date: req.body.date,
-            time: req.body.time,
-            idtrack: req.body.idtrack,
-            uuid: uuidv4()
-        }
-        //retrieve the users collection data
+        /*  const muzzy = {
+              opinion: req.body.opinion,
+              score: req.body.score,
+              muzzyimg: req.body.muzzyimg,
+              muzzytrack: req.body.muzzytrack,
+              muzzyartist: req.body.muzzyartist,
+              username: req.body.username,
+              date: req.body.date,
+              time: req.body.time,
+              idtrack: req.body.idtrack,
+              uuid: uuidv4()
+          }*/
+        //retrieve the muzzys collection data
         const colli = client.db('muzzysystem').collection('muzzys');
+        let muzzy = new Track(req.body.opinion, req.body.score, req.body.muzzyimg, req.body.muzzytrack, req.body.muzzyartist, req.body.username, req.body.date, req.body.time, req.body.idtrack, uuidv4())
         const insertedMuzzy = await colli.insertOne(muzzy)
+
+
 
         //send back when muzzy is saved
         res.status(201).send({
@@ -137,20 +140,22 @@ app.post("/savealbummuzzy", async (req, res) => {
         //connect to the db
         await client.connect();
 
-        const muzzy = {
-            opinion: req.body.opinion,
-            score: req.body.score,
-            muzzyimg: req.body.muzzyimg,
-            muzzyalbum: req.body.muzzyalbum,
-            muzzyartist: req.body.muzzyartist,
-            username: req.body.username,
-            date: req.body.date,
-            time: req.body.time,
-            idalbum: req.body.idalbum,
-            uuid: uuidv4()
-        }
+        /*  const muzzy = {
+              opinion: req.body.opinion,
+              score: req.body.score,
+              muzzyimg: req.body.muzzyimg,
+              muzzyalbum: req.body.muzzyalbum,
+              muzzyartist: req.body.muzzyartist,
+              username: req.body.username,
+              date: req.body.date,
+              time: req.body.time,
+              idalbum: req.body.idalbum,
+              uuid: uuidv4()
+          }*/
         //retrieve the users collection data
         const colli = client.db('muzzysystem').collection('albummuzzys');
+        let muzzy = new Album(req.body.opinion, req.body.score, req.body.muzzyimg, req.body.muzzyalbum, req.body.muzzyartist, req.body.username, req.body.date, req.body.time, req.body.idalbum, uuidv4())
+
         const insertedMuzzy = await colli.insertOne(muzzy)
 
         //send back when muzzy is saved
@@ -211,19 +216,21 @@ app.post("/saveartistmuzzy", async (req, res) => {
         //connect to the db
         await client.connect();
 
-        const muzzy = {
-            opinion: req.body.opinion,
-            score: req.body.score,
-            muzzyimg: req.body.muzzyimg,
-            muzzyartist: req.body.muzzyartist,
-            username: req.body.username,
-            date: req.body.date,
-            time: req.body.time,
-            idartist: req.body.idartist,
-            uuid: uuidv4()
-        }
+        /* const muzzy = {
+             opinion: req.body.opinion,
+             score: req.body.score,
+             muzzyimg: req.body.muzzyimg,
+             muzzyartist: req.body.muzzyartist,
+             username: req.body.username,
+             date: req.body.date,
+             time: req.body.time,
+             idartist: req.body.idartist,
+             uuid: uuidv4()
+         }*/
         //retrieve the users collection data
         const colli = client.db('muzzysystem').collection('artistmuzzys');
+        let muzzy = new Artist(req.body.opinion, req.body.score, req.body.muzzyimg, req.body.muzzyartist, req.body.username, req.body.date, req.body.time, req.body.idartist, uuidv4())
+
         const insertedMuzzy = await colli.insertOne(muzzy)
 
         //send back when muzzy is saved
@@ -246,16 +253,13 @@ app.post("/saveartistmuzzy", async (req, res) => {
 })
 
 
-
-
-
 //LOGIN SYSTEM
 app.get('/testMongo', async (req, res) => {
     try {
         //connect to the db
         await client.connect();
         //retrieve the users collection data
-        const colli = client.db('logintutorial').collection('users');
+        const colli = client.db('muzzysystem').collection('users');
         const users = await colli.find({}).toArray();
 
         //send back the data with response
@@ -291,10 +295,11 @@ app.post("/register", async (req, res) => {
             username: req.body.username,
             email: req.body.email,
             password: req.body.password,
-            uuid: uuidv4()
+            uuid: uuidv4(),
+
         }
         //retrieve the users collection data
-        const colli = client.db('logintutorial').collection('users');
+        const colli = client.db('muzzysystem').collection('users');
         const insertedUser = await colli.insertOne(user)
 
         //send back when user is saved
@@ -336,7 +341,7 @@ app.post("/login", async (req, res) => {
             password: req.body.password
         }
         //retrieve the users collection data
-        const colli = client.db('logintutorial').collection('users');
+        const colli = client.db('muzzysystem').collection('users');
 
         const query = {
             email: loginuser.email
@@ -409,7 +414,7 @@ app.post("/verifyID", async (req, res) => {
         await client.connect();
 
         //retrieve the users collection data
-        const colli = client.db('logintutorial').collection('users');
+        const colli = client.db('muzzysystem').collection('users');
 
         const query = {
             uuid: req.body.uuid
@@ -447,6 +452,8 @@ app.post("/verifyID", async (req, res) => {
 
 })
 
+//CRUD PROFILE SYSTEM
+
 // Get a user with uuid  (using a npm package)
 app.get('/:id', async (req, res) => {
     try {
@@ -455,7 +462,7 @@ app.get('/:id', async (req, res) => {
         await client.connect()
 
         //retrieve the users collection data
-        const usersCollection = client.db('logintutorial').collection('users');
+        const usersCollection = client.db('muzzysystem').collection('users');
 
         //queryforuuid
         const query = {
@@ -483,7 +490,7 @@ app.delete('/:id', async (req, res) => {
         await client.connect();
 
         //retrieve the users collection data
-        const usersCollection = client.db('logintutorial').collection('users');
+        const usersCollection = client.db('muzzysystem').collection('users');
 
         //queryforuuid
         const query = {
@@ -519,7 +526,7 @@ app.put('/:id', async (req, res) => {
         //connect to the db
         await client.connect();
         //retrieve the users collection data
-        const usersCollection = client.db('logintutorial').collection('users');
+        const usersCollection = client.db('muzzysystem').collection('users');
 
         //queryforuuid
         const query = {
@@ -563,6 +570,8 @@ app.put('/:id', async (req, res) => {
         await client.close();
     }
 });
+
+
 
 
 
