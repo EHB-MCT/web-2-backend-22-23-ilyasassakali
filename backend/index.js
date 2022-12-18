@@ -9,9 +9,9 @@ const {
     validate: uuidValidate
 } = require('uuid')
 require('dotenv').config()
-const Track = require('./Track.js')
-const Album = require('./Album.js')
-const Artist = require('./Artist.js')
+const Track = require('./modal/Track.js')
+const Album = require('./modal/Album.js')
+const Artist = require('./modal/Artist.js')
 //create mongoclient
 const client = new MongoClient(process.env.FINAL_URL)
 
@@ -45,7 +45,6 @@ app.get('/AllMuzzys', async (req, res) => {
         await client.close();
     }
 })
-
 app.post("/savemuzzy", async (req, res) => {
 
 
@@ -57,7 +56,6 @@ app.post("/savemuzzy", async (req, res) => {
         })
         return
     }
-
 
     try {
         //connect to the db
@@ -79,8 +77,16 @@ app.post("/savemuzzy", async (req, res) => {
         const colli = client.db('muzzysystem').collection('muzzys');
         let muzzy = new Track(req.body.opinion, req.body.score, req.body.muzzyimg, req.body.muzzytrack, req.body.muzzyartist, req.body.username, req.body.date, req.body.time, req.body.idtrack, uuidv4())
         const insertedMuzzy = await colli.insertOne(muzzy)
-
-
+        const user = await client.db("muzzysystem").collection("users").findOne({
+            username: muzzy.username
+        })
+        const response = await client.db("muzzysystem").collection("users").updateOne({
+            uuid: user.uuid
+        }, {
+            $push: {
+                userMuzzys: muzzy.uuid
+            }
+        })
 
         //send back when muzzy is saved
         res.status(201).send({
@@ -100,7 +106,59 @@ app.post("/savemuzzy", async (req, res) => {
     }
 
 })
+app.post("/allmyMuzzys", async (req, res) => {
+    const username = req.body.username;
+    const userUuid = req.body.uuid;
 
+    try {
+        //connect to the db
+        await client.connect();
+
+        //retrieve the muzzys and users collection data
+
+        const user = await client.db("muzzysystem").collection("users").findOne({
+            uuid: userUuid,
+            username: username
+        })
+
+        if (!user["userMuzzys"]) {
+            req.status(201).send({
+                status: "Succeed",
+                message: "User doesn't have any muzzys.",
+                data: undefined
+            })
+        }
+
+        const userMuzzyUuids = user["userMuzzys"];
+
+        const userMuzzys = await client.db("muzzysystem").collection("muzzys").find({
+            uuid: {
+                $in: userMuzzyUuids
+            }
+        }).toArray()
+
+
+
+
+        //give your saved muzzys
+        res.status(201).send({
+            status: "Saved",
+            message: "your Muzzys are saved in your mymuzzys section successfully",
+            data: userMuzzys
+
+        })
+    } catch (error) {
+        console.log(error);
+        res.status(500).send({
+            error: 'something went wrong',
+            value: error
+        });
+    } finally {
+        await client.close();
+    }
+
+
+})
 //muzzyalbums
 app.get('/AllalbumMuzzys', async (req, res) => {
     try {
@@ -122,7 +180,6 @@ app.get('/AllalbumMuzzys', async (req, res) => {
         await client.close();
     }
 })
-
 app.post("/savealbummuzzy", async (req, res) => {
 
 
@@ -155,9 +212,17 @@ app.post("/savealbummuzzy", async (req, res) => {
         //retrieve the users collection data
         const colli = client.db('muzzysystem').collection('albummuzzys');
         let muzzy = new Album(req.body.opinion, req.body.score, req.body.muzzyimg, req.body.muzzyalbum, req.body.muzzyartist, req.body.username, req.body.date, req.body.time, req.body.idalbum, uuidv4())
-
         const insertedMuzzy = await colli.insertOne(muzzy)
-
+        const user = await client.db("muzzysystem").collection("users").findOne({
+            username: muzzy.username
+        })
+        const response = await client.db("muzzysystem").collection("users").updateOne({
+            uuid: user.uuid
+        }, {
+            $push: {
+                userMuzzys: muzzy.uuid
+            }
+        })
         //send back when muzzy is saved
         res.status(201).send({
             status: "Saved",
@@ -176,7 +241,59 @@ app.post("/savealbummuzzy", async (req, res) => {
     }
 
 })
+app.post("/allmyMuzzysalbum", async (req, res) => {
+    const username = req.body.username;
+    const userUuid = req.body.uuid;
 
+    try {
+        //connect to the db
+        await client.connect();
+
+        //retrieve the muzzys and users collection data
+
+        const user = await client.db("muzzysystem").collection("users").findOne({
+            uuid: userUuid,
+            username: username
+        })
+
+        if (!user["userMuzzys"]) {
+            req.status(201).send({
+                status: "Succeed",
+                message: "User doesn't have any muzzys.",
+                data: undefined
+            })
+        }
+
+        const userMuzzyUuids = user["userMuzzys"];
+
+        const userMuzzys = await client.db("muzzysystem").collection("albummuzzys").find({
+            uuid: {
+                $in: userMuzzyUuids
+            }
+        }).toArray()
+
+
+
+
+        //give your saved muzzys
+        res.status(201).send({
+            status: "Saved",
+            message: "your Muzzys are saved in your mymuzzys section successfully",
+            data: userMuzzys
+
+        })
+    } catch (error) {
+        console.log(error);
+        res.status(500).send({
+            error: 'something went wrong',
+            value: error
+        });
+    } finally {
+        await client.close();
+    }
+
+
+})
 //muzzyartists
 app.get('/AllartistMuzzys', async (req, res) => {
     try {
@@ -198,7 +315,6 @@ app.get('/AllartistMuzzys', async (req, res) => {
         await client.close();
     }
 })
-
 app.post("/saveartistmuzzy", async (req, res) => {
 
 
@@ -232,6 +348,16 @@ app.post("/saveartistmuzzy", async (req, res) => {
         let muzzy = new Artist(req.body.opinion, req.body.score, req.body.muzzyimg, req.body.muzzyartist, req.body.username, req.body.date, req.body.time, req.body.idartist, uuidv4())
 
         const insertedMuzzy = await colli.insertOne(muzzy)
+        const user = await client.db("muzzysystem").collection("users").findOne({
+            username: muzzy.username
+        })
+        const response = await client.db("muzzysystem").collection("users").updateOne({
+            uuid: user.uuid
+        }, {
+            $push: {
+                userMuzzys: muzzy.uuid
+            }
+        })
 
         //send back when muzzy is saved
         res.status(201).send({
@@ -251,6 +377,122 @@ app.post("/saveartistmuzzy", async (req, res) => {
     }
 
 })
+app.post("/allmyMuzzysartist", async (req, res) => {
+    const username = req.body.username;
+    const userUuid = req.body.uuid;
+
+    try {
+        //connect to the db
+        await client.connect();
+
+        //retrieve the muzzys and users collection data
+
+        const user = await client.db("muzzysystem").collection("users").findOne({
+            uuid: userUuid,
+            username: username
+        })
+
+        if (!user["userMuzzys"]) {
+            req.status(201).send({
+                status: "Succeed",
+                message: "User doesn't have any muzzys.",
+                data: undefined
+            })
+        }
+
+        const userMuzzyUuids = user["userMuzzys"];
+
+        const userMuzzys = await client.db("muzzysystem").collection("artistmuzzys").find({
+            uuid: {
+                $in: userMuzzyUuids
+            }
+        }).toArray()
+
+
+
+
+        //give your saved muzzys
+        res.status(201).send({
+            status: "Saved",
+            message: "your Muzzys are saved in your mymuzzys section successfully",
+            data: userMuzzys
+
+        })
+    } catch (error) {
+        console.log(error);
+        res.status(500).send({
+            error: 'something went wrong',
+            value: error
+        });
+    } finally {
+        await client.close();
+    }
+
+
+})
+//place in mymuzzys section
+app.post("/savemyMuzzys", async (req, res) => {
+    //check for empty fields
+    if (!req.body.username && !req.body.uuid) {
+        res.status(401).send({
+            status: "Bad request",
+            message: "Some fields are missing: uuid, username"
+        })
+        return
+    }
+
+    const username = req.body.username;
+    const userUuid = req.body.uuid;
+
+
+    try {
+        //connect to the db
+        await client.connect();
+
+        //retrieve the muzzys and users collection data
+
+        const user = await client.db("muzzysystem").collection("users").findOne({
+            uuid: userUuid,
+            username: username
+        })
+
+        if (!user["userMuzzys"]) {
+            req.status(201).send({
+                status: "Succeed",
+                message: "User doesn't have any muzzys.",
+                data: undefined
+            })
+        }
+
+        /*  const userMuzzyUuids = user["userMuzzys"];
+
+          const userMuzzys = await client.db("muzzysystem").collection("muzzys").find({
+              uuid: {
+                  $in: userMuzzyUuids
+              }
+          }).toArray()*/
+
+        //send back when muzzy is saved
+        res.status(201).send({
+            status: "Saved",
+            message: "Muzzy has been saved in mymuzzys successfully",
+            data: userMuzzys
+
+        })
+    } catch (error) {
+        console.log(error);
+        res.status(500).send({
+            error: 'something went wrong',
+            value: error
+        });
+    } finally {
+        await client.close();
+    }
+
+
+})
+
+
 
 
 //LOGIN SYSTEM
@@ -274,7 +516,6 @@ app.get('/testMongo', async (req, res) => {
         await client.close();
     }
 })
-
 app.post("/register", async (req, res) => {
 
 
@@ -319,7 +560,6 @@ app.post("/register", async (req, res) => {
     }
 
 })
-
 app.post("/login", async (req, res) => {
 
 
@@ -388,7 +628,6 @@ app.post("/login", async (req, res) => {
 
 
 })
-
 app.post("/verifyID", async (req, res) => {
 
 
@@ -453,7 +692,6 @@ app.post("/verifyID", async (req, res) => {
 })
 
 //CRUD PROFILE SYSTEM
-
 // Get a user with uuid  (using a npm package)
 app.get('/:id', async (req, res) => {
     try {
@@ -482,7 +720,6 @@ app.get('/:id', async (req, res) => {
         await client.close()
     }
 })
-
 // Delete a user with uuid (using a npm package)
 app.delete('/:id', async (req, res) => {
     try {
@@ -508,7 +745,6 @@ app.delete('/:id', async (req, res) => {
         });
     }
 })
-
 // Update username,email and password (using a npm package)
 app.put('/:id', async (req, res) => {
 
