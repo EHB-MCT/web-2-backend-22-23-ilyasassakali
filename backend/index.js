@@ -105,59 +105,7 @@ app.post("/savemuzzy", async (req, res) => {
     }
 
 })
-app.post("/allmyMuzzys", async (req, res) => {
-    const username = req.body.username;
-    const userUuid = req.body.uuid;
 
-    try {
-        //connect to the db
-        await client.connect();
-
-        //retrieve the muzzys and users collection data
-
-        const user = await client.db("muzzysystem").collection("users").findOne({
-            uuid: userUuid,
-            username: username
-        })
-
-        if (!user["userMuzzys"]) {
-            req.status(201).send({
-                status: "Succeed",
-                message: "User doesn't have any muzzys.",
-                data: undefined
-            })
-        }
-
-        const userMuzzyUuids = user["userMuzzys"];
-
-        const userMuzzys = await client.db("muzzysystem").collection("muzzys").find({
-            uuid: {
-                $in: userMuzzyUuids
-            }
-        }).toArray()
-
-
-
-
-        //give your saved muzzys
-        res.status(201).send({
-            status: "Saved",
-            message: "your Muzzys are saved in your mymuzzys section successfully",
-            data: userMuzzys
-
-        })
-    } catch (error) {
-        console.log(error);
-        res.status(500).send({
-            error: 'something went wrong',
-            value: error
-        });
-    } finally {
-        await client.close();
-    }
-
-
-})
 // Delete a track muzzy with uuid 
 app.delete('/deletemuzzy/:id', async (req, res) => {
     try {
@@ -265,59 +213,7 @@ app.post("/savealbummuzzy", async (req, res) => {
     }
 
 })
-app.post("/allmyMuzzysalbum", async (req, res) => {
-    const username = req.body.username;
-    const userUuid = req.body.uuid;
 
-    try {
-        //connect to the db
-        await client.connect();
-
-        //retrieve the muzzys and users collection data
-
-        const user = await client.db("muzzysystem").collection("users").findOne({
-            uuid: userUuid,
-            username: username
-        })
-
-        if (!user["userMuzzys"]) {
-            req.status(201).send({
-                status: "Succeed",
-                message: "User doesn't have any muzzys.",
-                data: undefined
-            })
-        }
-
-        const userMuzzyUuids = user["userMuzzys"];
-
-        const userMuzzys = await client.db("muzzysystem").collection("albummuzzys").find({
-            uuid: {
-                $in: userMuzzyUuids
-            }
-        }).toArray()
-
-
-
-
-        //give your saved muzzys
-        res.status(201).send({
-            status: "Saved",
-            message: "your Muzzys are saved in your mymuzzys section successfully",
-            data: userMuzzys
-
-        })
-    } catch (error) {
-        console.log(error);
-        res.status(500).send({
-            error: 'something went wrong',
-            value: error
-        });
-    } finally {
-        await client.close();
-    }
-
-
-})
 // Delete an album muzzy with uuid 
 app.delete('/deletemuzzyalbum/:id', async (req, res) => {
     try {
@@ -426,59 +322,6 @@ app.post("/saveartistmuzzy", async (req, res) => {
     }
 
 })
-app.post("/allmyMuzzysartist", async (req, res) => {
-    const username = req.body.username;
-    const userUuid = req.body.uuid;
-
-    try {
-        //connect to the db
-        await client.connect();
-
-        //retrieve the muzzys and users collection data
-
-        const user = await client.db("muzzysystem").collection("users").findOne({
-            uuid: userUuid,
-            username: username
-        })
-
-        if (!user["userMuzzys"]) {
-            req.status(201).send({
-                status: "Succeed",
-                message: "User doesn't have any muzzys.",
-                data: undefined
-            })
-        }
-
-        const userMuzzyUuids = user["userMuzzys"];
-
-        const userMuzzys = await client.db("muzzysystem").collection("artistmuzzys").find({
-            uuid: {
-                $in: userMuzzyUuids
-            }
-        }).toArray()
-
-
-
-
-        //give your saved muzzys
-        res.status(201).send({
-            status: "Saved",
-            message: "your Muzzys are saved in your mymuzzys section successfully",
-            data: userMuzzys
-
-        })
-    } catch (error) {
-        console.log(error);
-        res.status(500).send({
-            error: 'something went wrong',
-            value: error
-        });
-    } finally {
-        await client.close();
-    }
-
-
-})
 // Delete an artist muzzy with uuid 
 app.delete('/deletemuzzyartist/:id', async (req, res) => {
     try {
@@ -565,6 +408,165 @@ app.post("/savemyMuzzys", async (req, res) => {
 
 
 })
+
+/**/ /////a regler ptndmerd
+app.post("/allmyMuzzys", async (req, res) => {
+    const username = req.body.username;
+    const userUuid = req.body.uuid;
+
+    try {
+        //connect to the db
+        await client.connect();
+
+        //retrieve the muzzys and users collection data
+
+        const user = await client.db("muzzysystem").collection("users").findOne({
+            uuid: userUuid,
+            username: username
+        })
+
+        if (!user["userMuzzys"]) {
+            req.status(201).send({
+                status: "Succeed",
+                message: "User doesn't have any muzzys.",
+                data: undefined
+            })
+        }
+
+        const userMuzzyUuids = user["userMuzzys"];
+
+        const userMuzzys = await client.db("muzzysystem").collection("muzzys").find({
+            uuid: {
+                $in: userMuzzyUuids
+            }
+        }).toArray()
+
+        //give your saved muzzys
+        res.status(201).send({
+            status: "Saved",
+            message: "your Muzzys are saved in your mymuzzys section successfully",
+            data: userMuzzys
+
+        })
+    } catch (error) {
+        console.log(error);
+        res.status(500).send({
+            error: 'something went wrong',
+            value: error
+        });
+    } finally {
+        await client.close();
+    }
+
+
+})
+app.post("/allmyMuzzysalbum", async (req, res) => {
+    const username = req.body.username;
+    const userUuid = req.body.uuid;
+
+    try {
+        //connect to the db
+        await client.connect();
+
+        //retrieve the muzzys and users collection data
+
+        const user = await client.db("muzzysystem").collection("users").findOne({
+            uuid: userUuid,
+            username: username
+        })
+
+        if (!user["userMuzzys"]) {
+            req.status(201).send({
+                status: "Succeed",
+                message: "User doesn't have any muzzys.",
+                data: undefined
+            })
+        }
+
+        const userMuzzyUuids = user["userMuzzys"];
+
+        const userMuzzys = await client.db("muzzysystem").collection("albummuzzys").find({
+            uuid: {
+                $in: userMuzzyUuids
+            }
+        }).toArray()
+
+
+
+
+        //give your saved muzzys
+        res.status(201).send({
+            status: "Saved",
+            message: "your Muzzys are saved in your mymuzzys section successfully",
+            data: userMuzzys
+
+        })
+    } catch (error) {
+        console.log(error);
+        res.status(500).send({
+            error: 'something went wrong',
+            value: error
+        });
+    } finally {
+        await client.close();
+    }
+
+
+})
+app.post("/allmyMuzzysartist", async (req, res) => {
+    const username = req.body.username;
+    const userUuid = req.body.uuid;
+
+    try {
+        //connect to the db
+        await client.connect();
+
+        //retrieve the muzzys and users collection data
+
+        const user = await client.db("muzzysystem").collection("users").findOne({
+            uuid: userUuid,
+            username: username
+        })
+
+        if (!user["userMuzzys"]) {
+            req.status(201).send({
+                status: "Succeed",
+                message: "User doesn't have any muzzys.",
+                data: undefined
+            })
+        }
+
+        const userMuzzyUuids = user["userMuzzys"];
+
+        const userMuzzys = await client.db("muzzysystem").collection("artistmuzzys").find({
+            uuid: {
+                $in: userMuzzyUuids
+            }
+        }).toArray()
+
+
+
+
+        //give your saved muzzys
+        res.status(201).send({
+            status: "Saved",
+            message: "your Muzzys are saved in your mymuzzys section successfully",
+            data: userMuzzys
+
+        })
+    } catch (error) {
+        console.log(error);
+        res.status(500).send({
+            error: 'something went wrong',
+            value: error
+        });
+    } finally {
+        await client.close();
+    }
+
+
+})
+/**/
 
 
 
