@@ -23,7 +23,6 @@ app.use(express.json())
 
 
 //CRUD MUZZY SYSTEM
-
 //muzzytracks
 app.get('/AllMuzzys', async (req, res) => {
     try {
@@ -158,6 +157,31 @@ app.post("/allmyMuzzys", async (req, res) => {
     }
 
 
+})
+// Delete a track muzzy with uuid 
+app.delete('/deletemuzzy/:id', async (req, res) => {
+    try {
+        //connect to the db
+        await client.connect();
+
+        //retrieve the users collection data
+        const muzzyCollection = client.db('muzzysystem').collection('muzzys');
+
+        //queryforuuid
+        const query = {
+            uuid: req.params.id
+        }
+
+        const muzzyDelete = await muzzyCollection.deleteOne(query)
+
+        res.status(200).send(muzzyDelete);
+    } catch (error) {
+
+        res.status(500).send({
+            error: 'error',
+            value: error.stack
+        });
+    }
 })
 //muzzyalbums
 app.get('/AllalbumMuzzys', async (req, res) => {
@@ -294,6 +318,31 @@ app.post("/allmyMuzzysalbum", async (req, res) => {
 
 
 })
+// Delete an album muzzy with uuid 
+app.delete('/deletemuzzyalbum/:id', async (req, res) => {
+    try {
+        //connect to the db
+        await client.connect();
+
+        //retrieve the users collection data
+        const muzzyCollection = client.db('muzzysystem').collection('albummuzzys');
+
+        //queryforuuid
+        const query = {
+            uuid: req.params.id
+        }
+
+        const muzzyDelete = await muzzyCollection.deleteOne(query)
+
+        res.status(200).send(muzzyDelete);
+    } catch (error) {
+
+        res.status(500).send({
+            error: 'error',
+            value: error.stack
+        });
+    }
+})
 //muzzyartists
 app.get('/AllartistMuzzys', async (req, res) => {
     try {
@@ -429,6 +478,31 @@ app.post("/allmyMuzzysartist", async (req, res) => {
     }
 
 
+})
+// Delete an artist muzzy with uuid 
+app.delete('/deletemuzzyartist/:id', async (req, res) => {
+    try {
+        //connect to the db
+        await client.connect();
+
+        //retrieve the users collection data
+        const muzzyCollection = client.db('muzzysystem').collection('artistmuzzys');
+
+        //queryforuuid
+        const query = {
+            uuid: req.params.id
+        }
+
+        const muzzyDelete = await muzzyCollection.deleteOne(query)
+
+        res.status(200).send(muzzyDelete);
+    } catch (error) {
+
+        res.status(500).send({
+            error: 'error',
+            value: error.stack
+        });
+    }
 })
 //place in mymuzzys section
 app.post("/savemyMuzzys", async (req, res) => {
@@ -692,7 +766,7 @@ app.post("/verifyID", async (req, res) => {
 })
 
 //CRUD PROFILE SYSTEM
-// Get a user with uuid  (using a npm package)
+// Get a user with uuid  
 app.get('/:id', async (req, res) => {
     try {
         let uuid = req.params.id;
@@ -720,7 +794,7 @@ app.get('/:id', async (req, res) => {
         await client.close()
     }
 })
-// Delete a user with uuid (using a npm package)
+// Delete a user with uuid 
 app.delete('/:id', async (req, res) => {
     try {
         //connect to the db
@@ -745,7 +819,7 @@ app.delete('/:id', async (req, res) => {
         });
     }
 })
-// Update username,email and password (using a npm package)
+// Update username,email and password 
 app.put('/:id', async (req, res) => {
 
     //check for empty fields
