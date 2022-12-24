@@ -15,7 +15,6 @@ const Artist = require('./modal/Artist.js')
 //create mongoclient
 const client = new MongoClient(process.env.FINAL_URL)
 
-const port = process.env.port || 1337;
 
 app.use(express.urlencoded({
     extended: false
