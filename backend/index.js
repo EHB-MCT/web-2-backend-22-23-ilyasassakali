@@ -14,13 +14,13 @@ const Album = require('./modal/Album.js')
 const Artist = require('./modal/Artist.js')
 //create mongoclient
 const client = new MongoClient(process.env.FINAL_URL)
-
-
 app.use(express.urlencoded({
     extended: false
 }));
 app.use(cors())
 app.use(express.json())
+
+const port = process.env.port || 1337;
 
 
 
@@ -39,7 +39,7 @@ app.get('/AllMuzzys', async (req, res) => {
         //send back the data with response
         res.status(200).send(muzzys);
     } catch (error) {
-        console.log(error);
+
         res.status(500).send({
             error: 'something went wrong',
             value: error
@@ -99,7 +99,7 @@ app.post("/savemuzzy", async (req, res) => {
 
         })
     } catch (error) {
-        console.log(error);
+
         res.status(500).send({
             error: 'something went wrong',
             value: error
@@ -207,7 +207,7 @@ app.post("/savealbummuzzy", async (req, res) => {
 
         })
     } catch (error) {
-        console.log(error);
+
         res.status(500).send({
             error: 'something went wrong',
             value: error
