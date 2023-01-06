@@ -13,6 +13,7 @@ const Track = require('./modal/Track.js')
 const Album = require('./modal/Album.js')
 const Artist = require('./modal/Artist.js')
 //create mongoclient
+console.log(process.env)
 const client = new MongoClient(process.env.FINAL_URL)
 app.use(express.urlencoded({
     extended: false
