@@ -20,7 +20,7 @@ app.use(express.urlencoded({
 app.use(cors())
 app.use(express.json())
 
-const port = process.env.port || 1337;
+const port = process.env.PORT || 1337;
 
 
 
