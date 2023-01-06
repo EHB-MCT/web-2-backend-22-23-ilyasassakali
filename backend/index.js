@@ -23,7 +23,11 @@ app.use(express.json())
 const port = process.env.PORT || 1337;
 
 
-
+app.get("/", async (req, res) => {
+    res.json({
+        message: "YES I WORK"
+    })
+})
 
 
 //CRUD MUZZY SYSTEM
